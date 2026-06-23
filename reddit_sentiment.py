@@ -160,9 +160,13 @@ def visualize(counts: Counter, scores: pd.DataFrame, top_n: int,
 
     # Treemap of the most mentioned topics.
     top = counts.most_common(top_n)
+    # Pass explicit colors: squarify's default path calls the long-removed
+    # matplotlib.cm.get_cmap(), which blows up on matplotlib >= 3.9.
+    cmap = matplotlib.colormaps["viridis"]
+    colors = [cmap(i / max(len(top) - 1, 1)) for i in range(len(top))]
     plt.figure(figsize=(10, 6))
     squarify.plot(sizes=[n for _, n in top],
-                  label=[f"{t}: {n}" for t, n in top], alpha=0.7)
+                  label=[f"{t}: {n}" for t, n in top], color=colors, alpha=0.7)
     plt.axis("off")
     plt.title(f"{len(top)} most mentioned topics")
     if save_dir:
